@@ -1,0 +1,8 @@
+__pycache__/
+.DS_Store
+
+# External Repositories
+AmsterdamUMCdb/
+mimic-code/
+
+# Data
