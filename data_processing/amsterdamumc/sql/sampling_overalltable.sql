@@ -1,10 +1,13 @@
+-- Description: This query creates a new sampled_overalltable table,
+--      which discretizes the ICU stays into a grid using a predefined 4-hour window.
+--      The table contains the average or maximum values of the measurements in the window.
 -- Inspired by: https://github.com/arnepeine/ventai/blob/main/sampling_lab_withventparams.sql
 -- Execution time: Roughly 45 minutes for 4-hour window.
 -- Number of Rows: 1764311 (1.8 million) for 4-hour window
 
 SET search_path TO public, amsterdamumcdb, amsterdamumcdb_derived;
 
-DROP TABLE IF EXISTS sampled_overalltable; CREATE TABLE sampled_overalltable AS 
+DROP TABLE IF EXISTS sampled_overalltable; CREATE TABLE sampled_overalltable AS
 
 WITH minmax as
 (
@@ -34,10 +37,10 @@ SELECT ot.admissionid, start_time
     --lab values
     , avg(POTASSIUM) as POTASSIUM , avg(SODIUM) as SODIUM , avg(CHLORIDE) as CHLORIDE , avg(GLUCOSE) as GLUCOSE
     , avg(BUN) as BUN , avg(CREATININE) as CREATININE , avg(MAGNESIUM) as MAGNESIUM , avg(CALCIUM) as CALCIUM
-    , avg(BILIRUBIN) as BILIRUBIN , avg(ALBUMIN) as ALBUMIN 
+    , avg(BILIRUBIN) as BILIRUBIN , avg(ALBUMIN) as ALBUMIN
     , avg(HEMOGLOBIN) as HEMOGLOBIN , avg(WBC) as WBC , avg(PLATELET) as PLATELET , avg(PTT) as PTT
     , avg(INR) as INR , avg(PH) as PH , avg(PaO2) as PaO2 , avg(PaCO2) as PaCO2
-    , avg(BASE_EXCESS) as BASE_EXCESS , avg(BICARBONATE) as BICARBONATE , avg(LACTATE) as LACTATE 
+    , avg(BASE_EXCESS) as BASE_EXCESS , avg(BICARBONATE) as BICARBONATE , avg(LACTATE) as LACTATE
     , avg(CRP) as CRP, avg(ionizedcalcium) as ionizedcalcium
     , avg(ANIONGAP) as ANIONGAP
 

@@ -1,3 +1,8 @@
+-- Description: This query creates a new sampled_overalltable_combined_hourly table,
+--   	which inserts the records from the Demographics, SIRS, and SOFA into
+--      the sampled overalltable. In addition, it computes an approximated value
+--		for the compliance of the lungs. As this value is only an estimate, we
+--		decided to not include it in the final version of the paper.
 -- Source: https://github.com/florisdenhengst/ventai/blob/main/sampled_data_with_scdem_withventparams.sql
 -- Execution time: Roughly 10 seconds.
 -- Number of rows: 1764311 (1.8 million) for 4-hour window, 4927360 (4.9 million) for 1-hour window.
@@ -9,7 +14,6 @@ DROP TABLE IF EXISTS sampled_overalltable_combined_hourly; CREATE TABLE sampled_
 WITH combined AS (
 	SELECT samp.admissionid, dem.admittedat as intime, dem.dischargedat as outtime, samp.start_time
 		, dem.age as admission_age, dem.gender
-		-- , weig.avg AS weight
 		, dem.weight AS weight
 		, (CASE
 			WHEN dem.gender = 'Vrouw'
@@ -19,12 +23,10 @@ WITH combined AS (
 			ELSE NULL
 		END) as adult_ibw
 		, dem.icu_readmission
-		-- , dem.elixhauser_vanwalraven
 		, sf.sofa , sr.sirs
 		, samp.gcs , samp.heartrate , samp.sysbp, samp.diasbp, samp.meanbp, samp.shockindex
 		, (CASE WHEN samp.resprate IS NOT NULL THEN samp.resprate
 				WHEN samp.resprate_set IS NOT NULL THEN samp.resprate_set
-				-- WHEN samp.RespRate_spont IS NOT NULL THEN samp.RespRate_spont
 				ELSE NULL
 			END) AS resprate
 		, samp.resprate_spont AS resprate_spont
@@ -40,14 +42,13 @@ WITH combined AS (
 		, samp.iv_total, samp.cum_fluid_balance, samp.peep
 		, (CASE WHEN samp.tidal_volume IS NOT NULL THEN samp.tidal_volume
 				WHEN samp.tidal_volume_set IS NOT NULL THEN samp.tidal_volume_set
-				-- WHEN samp.tidal_volume_spont IS NOT NULL THEN samp.tidal_volume_spont 
 				ELSE NULL
 			END) AS tidal_volume
 		, samp.tidal_volume_spont AS tidal_volume_spont
 		, samp.plateau_pressure
 		, samp.PIP, samp.MAP
 		, samp.EtCO2
-		
+
 		, dem.hospmort, dem.mort90day, dem.dischargedat
 		, dem.dateofdeath, dem.admittedat as hadmittime, dem.dischargedat as hdischtime
 

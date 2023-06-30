@@ -1,10 +1,12 @@
+-- Description: This script creates a table with all the variables and measurements
+-- 		we want to use for our analysis.
 -- Inspired by: https://github.com/arnepeine/ventai/blob/main/overalltable_Lab_withventparams.sql
 -- Execution time: Roughly 1 minute.
 -- Number of Rows: 40867783 (40.9 million)
 
 SET search_path TO public, amsterdamumcdb, amsterdamumcdb_derived;
 
-DROP TABLE IF EXISTS merged_overalltable; CREATE TABLE merged_overalltable AS 
+DROP TABLE IF EXISTS merged_overalltable; CREATE TABLE merged_overalltable AS
 
 SELECT merged.admissionid, charttime
     -- GCS
@@ -19,10 +21,10 @@ SELECT merged.admissionid, charttime
     --lab values
     , avg(POTASSIUM) as POTASSIUM , avg(SODIUM) as SODIUM , avg(CHLORIDE) as CHLORIDE , avg(GLUCOSE) as GLUCOSE
     , avg(BUN) as BUN , avg(CREATININE) as CREATININE , avg(MAGNESIUM) as MAGNESIUM , avg(CALCIUM) as CALCIUM
-    , avg(BILIRUBIN) as BILIRUBIN , avg(ALBUMIN) as ALBUMIN 
+    , avg(BILIRUBIN) as BILIRUBIN , avg(ALBUMIN) as ALBUMIN
     , avg(HEMOGLOBIN) as HEMOGLOBIN , avg(WBC) as WBC , avg(PLATELET) as PLATELET , avg(PTT) as PTT
     , avg(INR) as INR , avg(PH) as PH , avg(PaO2) as PaO2 , avg(PaCO2) as PaCO2
-    , avg(BASE_EXCESS) as BASE_EXCESS , avg(BICARBONATE) as BICARBONATE , avg(LACTATE) as LACTATE 
+    , avg(BASE_EXCESS) as BASE_EXCESS , avg(BICARBONATE) as BICARBONATE , avg(LACTATE) as LACTATE
     , avg(CRP) as CRP, avg(ionizedcalcium) as ionizedcalcium
     , avg(ANIONGAP) as ANIONGAP
 
@@ -35,7 +37,7 @@ SELECT merged.admissionid, charttime
     , max(plateau_pressure) as plateau_pressure
 
     -- multiply by 100 because FiO2 is in a % but should be a fraction. This idea is retrieved from https://github.com/MIT-LCP/mimic-code/blob/master/concepts/firstday/blood-gas-first-day-arterial.sql
-    , avg(PaO2)/avg(Fio2)*100 as PaO2FiO2ratio 
+    , avg(PaO2)/avg(Fio2)*100 as PaO2FiO2ratio
 
     -- MechVent
     , avg(MechVent) as MechVent
@@ -69,10 +71,10 @@ FROM
     --lab values
     , POTASSIUM , SODIUM , CHLORIDE , GLUCOSE
     , BUN , CREATININE , MAGNESIUM , CALCIUM
-    , BILIRUBIN , ALBUMIN 
+    , BILIRUBIN , ALBUMIN
     , HEMOGLOBIN , WBC , PLATELET , PTT
     , INR , PH , PaO2 , PaCO2
-    , BASE_EXCESS , BICARBONATE , LACTATE 
+    , BASE_EXCESS , BICARBONATE , LACTATE
     , CRP, ionizedcalcium
     , ANIONGAP
 
@@ -118,10 +120,10 @@ UNION ALL
     --lab values
     , null::double precision as POTASSIUM , null::double precision as SODIUM , null::double precision as CHLORIDE , null::double precision as GLUCOSE
     , null::double precision as BUN , null::double precision as CREATININE , null::double precision as MAGNESIUM , null::double precision as CALCIUM
-    , null::double precision as BILIRUBIN , null::double precision as ALBUMIN 
+    , null::double precision as BILIRUBIN , null::double precision as ALBUMIN
     , null::double precision as HEMOGLOBIN , null::double precision as WBC , null::double precision as PLATELET , null::double precision as PTT
     , null::double precision as INR , null::double precision as PH , null::double precision as PaO2 , null::double precision as PaCO2
-    , null::double precision as BASE_EXCESS , null::double precision as BICARBONATE , null::double precision as LACTATE 
+    , null::double precision as BASE_EXCESS , null::double precision as BICARBONATE , null::double precision as LACTATE
     , null::double precision as CRP, null::double precision as ionizedcalcium
     , null::double precision as ANIONGAP
 
@@ -168,10 +170,10 @@ UNION ALL
     --lab values
     , null::double precision as POTASSIUM , null::double precision as SODIUM , null::double precision as CHLORIDE , null::double precision as GLUCOSE
     , null::double precision as BUN , null::double precision as CREATININE , null::double precision as MAGNESIUM , null::double precision as CALCIUM
-    , null::double precision as BILIRUBIN , null::double precision as ALBUMIN 
+    , null::double precision as BILIRUBIN , null::double precision as ALBUMIN
     , null::double precision as HEMOGLOBIN , null::double precision as WBC , null::double precision as PLATELET , null::double precision as PTT
     , null::double precision as INR , null::double precision as PH , null::double precision as PaO2 , null::double precision as PaCO2
-    , null::double precision as BASE_EXCESS , null::double precision as BICARBONATE , null::double precision as LACTATE 
+    , null::double precision as BASE_EXCESS , null::double precision as BICARBONATE , null::double precision as LACTATE
     , null::double precision as CRP, null::double precision as ionizedcalcium
     , null::double precision as ANIONGAP
 
@@ -218,10 +220,10 @@ UNION ALL
     --lab values
     , null::double precision as POTASSIUM , null::double precision as SODIUM , null::double precision as CHLORIDE , null::double precision as GLUCOSE
     , null::double precision as BUN , null::double precision as CREATININE , null::double precision as MAGNESIUM , null::double precision as CALCIUM
-    , null::double precision as BILIRUBIN , null::double precision as ALBUMIN 
+    , null::double precision as BILIRUBIN , null::double precision as ALBUMIN
     , null::double precision as HEMOGLOBIN , null::double precision as WBC , null::double precision as PLATELET , null::double precision as PTT
     , null::double precision as INR , null::double precision as PH , null::double precision as PaO2 , null::double precision as PaCO2
-    , null::double precision as BASE_EXCESS , null::double precision as BICARBONATE , null::double precision as LACTATE 
+    , null::double precision as BASE_EXCESS , null::double precision as BICARBONATE , null::double precision as LACTATE
     , null::double precision as CRP, null::double precision as ionizedcalcium
     , null::double precision as ANIONGAP
 
@@ -268,10 +270,10 @@ UNION ALL
     --lab values
     , null::double precision as POTASSIUM , null::double precision as SODIUM , null::double precision as CHLORIDE , null::double precision as GLUCOSE
     , null::double precision as BUN , null::double precision as CREATININE , null::double precision as MAGNESIUM , null::double precision as CALCIUM
-    , null::double precision as BILIRUBIN , null::double precision as ALBUMIN 
+    , null::double precision as BILIRUBIN , null::double precision as ALBUMIN
     , null::double precision as HEMOGLOBIN , null::double precision as WBC , null::double precision as PLATELET , null::double precision as PTT
     , null::double precision as INR , null::double precision as PH , null::double precision as PaO2 , null::double precision as PaCO2
-    , null::double precision as BASE_EXCESS , null::double precision as BICARBONATE , null::double precision as LACTATE 
+    , null::double precision as BASE_EXCESS , null::double precision as BICARBONATE , null::double precision as LACTATE
     , null::double precision as CRP, null::double precision as ionizedcalcium
     , null::double precision as ANIONGAP
 
@@ -318,10 +320,10 @@ UNION ALL
     --lab values
     , null::double precision as POTASSIUM , null::double precision as SODIUM , null::double precision as CHLORIDE , null::double precision as GLUCOSE
     , null::double precision as BUN , null::double precision as CREATININE , null::double precision as MAGNESIUM , null::double precision as CALCIUM
-    , null::double precision as BILIRUBIN , null::double precision as ALBUMIN 
+    , null::double precision as BILIRUBIN , null::double precision as ALBUMIN
     , null::double precision as HEMOGLOBIN , null::double precision as WBC , null::double precision as PLATELET , null::double precision as PTT
     , null::double precision as INR , null::double precision as PH , null::double precision as PaO2 , null::double precision as PaCO2
-    , null::double precision as BASE_EXCESS , null::double precision as BICARBONATE , null::double precision as LACTATE 
+    , null::double precision as BASE_EXCESS , null::double precision as BICARBONATE , null::double precision as LACTATE
     , null::double precision as CRP, null::double precision as ionizedcalcium
     , null::double precision as ANIONGAP
 
@@ -368,10 +370,10 @@ UNION ALL
     --lab values
     , null::double precision as POTASSIUM , null::double precision as SODIUM , null::double precision as CHLORIDE , null::double precision as GLUCOSE
     , null::double precision as BUN , null::double precision as CREATININE , null::double precision as MAGNESIUM , null::double precision as CALCIUM
-    , null::double precision as BILIRUBIN , null::double precision as ALBUMIN 
+    , null::double precision as BILIRUBIN , null::double precision as ALBUMIN
     , null::double precision as HEMOGLOBIN , null::double precision as WBC , null::double precision as PLATELET , null::double precision as PTT
     , null::double precision as INR , null::double precision as PH , null::double precision as PaO2 , null::double precision as PaCO2
-    , null::double precision as BASE_EXCESS , null::double precision as BICARBONATE , null::double precision as LACTATE 
+    , null::double precision as BASE_EXCESS , null::double precision as BICARBONATE , null::double precision as LACTATE
     , null::double precision as CRP, null::double precision as ionizedcalcium
     , null::double precision as ANIONGAP
 

@@ -1,3 +1,5 @@
+-- Description: This query copies all records from the sampled overalltable combined
+--              table to a CSV file.
 -- Source: https://github.com/florisdenhengst/ventai/blob/main/to_csv.sql
 -- Execution time: Roughly 5 seconds.
 -- Number of Rows copied: 536202 for 4-hour window, 2014515 for 1-hour window.
@@ -5,7 +7,7 @@
 COPY
 (
     SELECT * FROM sampled_overalltable_combined_hourly
-    WHERE 
+    WHERE
     sampled_overalltable_combined_hourly.admissionid IN (
         SELECT distinct(imvd.admissionid)
         FROM getinvasiveventdurations imvd

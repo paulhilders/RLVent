@@ -1,6 +1,6 @@
--- Description: This query creates a new sampled_overalltable_hourly table,
+-- Description: This query creates a new sampled_overalltable table,
 --      which discretizes the ICU stays into a grid using a predefined 4-hour window.
---      The table contains the average or maximum values of the measurements for window.
+--      The table contains the average or maximum values of the measurements in the window.
 -- Source: https://github.com/arnepeine/ventai/blob/main/sampling_lab_withventparams.sql
 -- Execution time: Roughly 1 hour.
 -- Number of Rows: 52092393 (52 million) for 4-hour window, 58875742 (5.9 million) for 1-hour window.

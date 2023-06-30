@@ -1,10 +1,12 @@
+-- Description: This query creates a new sofa_overalltable_hourly table, which contains
+--      the SOFA scores for patients in the AmsterdamUMCdb database.
 -- Source: https://github.com/florisdenhengst/ventai/blob/main/getSOFA_withventparams.sql
 -- Execution time: Roughly 1 minute.
 -- Number of rows: 1764311 (1.8 million) for 4-hour window, 4927360 (4.9 million) for 1-hour window.
 
 SET search_path TO public, amsterdamumcdb, amsterdamumcdb_derived;
 
-DROP TABLE IF EXISTS sofa_overalltable_hourly; CREATE TABLE sofa_overalltable_hourly AS 
+DROP TABLE IF EXISTS sofa_overalltable_hourly; CREATE TABLE sofa_overalltable_hourly AS
 
 with scorecomp as(
     SELECT admissionid, start_time
@@ -13,7 +15,7 @@ with scorecomp as(
         -- nervous system
         , gcs
         -- cardiovascular system
-        , meanbp, dopamine_rate 
+        , meanbp, dopamine_rate
         , norepinefrine_rate, epinefrine_rate
         -- liver
         , bilirubin
@@ -22,12 +24,12 @@ with scorecomp as(
         -- kidneys (renal)
         , creatinine, urineoutput
 
-    FROM sampled_overalltable_hourly
+    FROM sampled_overalltable_hourly -- Switch to alternative table to use other sampling window.
 ),
 scorecalc as
 (
 SELECT admissionid, start_time , PaO2FiO2ratio , mechvent , gcs, meanbp , dopamine_rate , norepinefrine_rate, epinefrine_rate
-       , bilirubin , platelet , creatinine, urineoutput 
+       , bilirubin , platelet , creatinine, urineoutput
 
 	, case
         when PaO2FiO2ratio < 100 and mechvent=1 then 4
@@ -37,7 +39,7 @@ SELECT admissionid, start_time , PaO2FiO2ratio , mechvent , gcs, meanbp , dopami
         when PaO2FiO2ratio is null then null
         else 0
     end as respiration
-	
+
 	  -- Neurological failure (GCS)
     , case
         when (gcs >= 13 and gcs <= 14) then 1
@@ -47,7 +49,7 @@ SELECT admissionid, start_time , PaO2FiO2ratio , mechvent , gcs, meanbp , dopami
         when  gcs is null then null
         else 0
     end as cns
-        
+
     -- Cardiovascular
     , case
         when dopamine_rate > 15 or epinefrine_rate >  0.1 or norepinefrine_rate >  0.1 then 4
@@ -57,7 +59,7 @@ SELECT admissionid, start_time , PaO2FiO2ratio , mechvent , gcs, meanbp , dopami
         when coalesce(MeanBP, dopamine_rate, epinefrine_rate, norepinefrine_rate) is null then null
         else 0
     end as cardiovascular
-        
+
         -- Liver
     , case
         -- Bilirubin checks in mg/dL
@@ -68,7 +70,7 @@ SELECT admissionid, start_time , PaO2FiO2ratio , mechvent , gcs, meanbp , dopami
         when Bilirubin is null then null
         else 0
     end as liver
-        
+
         -- Coagulation
     , case
         when platelet < 20  then 4
@@ -78,7 +80,7 @@ SELECT admissionid, start_time , PaO2FiO2ratio , mechvent , gcs, meanbp , dopami
         when platelet is null then null
         else 0
     end as coagulation
-        
+
         -- Renal failure - high creatinine or low urine output
     , case
         when (Creatinine >= 5.0) then 4
@@ -90,7 +92,7 @@ SELECT admissionid, start_time , PaO2FiO2ratio , mechvent , gcs, meanbp , dopami
         when coalesce(UrineOutput, Creatinine) is null then null
         else 0
     end as renal
-	
+
 	from scorecomp
 )
 
@@ -101,10 +103,10 @@ SELECT admissionid, start_time
     -- parameters from scorecalc, contains separate scores to estimate the final SOFA score
     , respiration , cns , cardiovascular , liver , coagulation , renal
     -- overall SOFA score calculation
-    , coalesce(respiration,0) + coalesce(cns,0) 
-    + coalesce(cardiovascular,0) + coalesce(liver,0) 
+    , coalesce(respiration,0) + coalesce(cns,0)
+    + coalesce(cardiovascular,0) + coalesce(liver,0)
     + coalesce(coagulation,0) + coalesce(renal,0) as SOFA
-	   
+
 FROM scorecalc
 
 ORDER BY admissionid, start_time

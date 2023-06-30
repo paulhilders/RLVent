@@ -11,7 +11,7 @@ DROP TABLE IF EXISTS sirs_overalltable_hourly; CREATE TABLE sirs_overalltable_ho
 with scorecomp as(
     SELECT admissionid , start_time
         , tempC , heartrate , resprate , paco2 , wbc
-    FROM sampled_overalltable_hourly
+    FROM sampled_overalltable_hourly -- Switch to alternative table to use other sampling window.
 ),
 scorecalc as
 (

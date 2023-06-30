@@ -1,6 +1,6 @@
 -- Description: This query creates a new sampled_overalltable_combined_hourly table,
 --   	which inserts the records from the Demographics, SIRS, SOFA, weight,
---		and IBW tables into the samled overalltable.
+--		and IBW tables into the sampled overalltable.
 -- Source: https://github.com/florisdenhengst/ventai/blob/main/sampled_data_with_scdem_withventparams.sql
 -- Execution time: Roughly 1 minute.
 -- Number of rows: 1555556 (1.5 million) for 4-hour window, 5956545 (6 million) for 1-hour window.
