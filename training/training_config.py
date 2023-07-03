@@ -1,5 +1,6 @@
 """
-training_config.py: Contains all the training configurations for the training script.
+training_config.py: Contains all the training configurations for the training
+    script.
 """
 SEED = 42
 n_epochs = 20
