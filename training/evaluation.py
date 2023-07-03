@@ -91,6 +91,31 @@ def evaluate_model(
             dynamics=dynamics_model,
             use_gpu=use_gpu
         )
+    elif algo_label == "DiscreteCOMBO":
+        if custom_dynamics:
+            dynamics_model = d3rlpy.dynamics.CustomProbabilisticEnsembleDynamics.from_json(f"{dynamics_path}/params.json")
+            dynamics_model.load_model(dynamics_checkpoint)
+        else:
+            dynamics_model = d3rlpy.dynamics.ProbabilisticEnsembleDynamics.from_json(f"{dynamics_path}/params.json")
+            dynamics_model.load_model(dynamics_checkpoint)
+
+        model = algo(
+            encoder_factory=encoder,
+            action_scaler=action_scaler,
+            reward_scaler=reward_scaler,
+            n_steps = n_steps,
+            n_frames = n_frames,
+            n_critics = n_critics,
+            alpha=combo_alpha,
+            q_func_factory='qr' if distQ else 'mean',
+            rollout_interval=rollout_interval,
+            rollout_horizon=rollout_horizon,
+            rollout_batch_size=rollout_batch_size,
+            real_ratio=real_ratio,
+            generated_maxlen=generated_maxlen,
+            dynamics=dynamics_model,
+            use_gpu=use_gpu
+        )
     else:
         model = algo(
             encoder_factory=encoder,
@@ -186,7 +211,7 @@ def load_datasets(experiment_name):
         discrete_action=discrete_action,
         apache2_rewards=apache2_rewards,
         terminal_flags=terminal_flags,
-        path=f"../data_processing/data/{sampling_window_hours}hour_window/generated_datasets/"
+        path=f"../data_processing/data/{dataset_prefix}{sampling_window_hours}hour_window/generated_datasets/"
     )
     print("Datasets loaded successfully!\n")
 
@@ -242,7 +267,7 @@ def load_config(log_path, experiment_name):
     model_based = ("COUPLe" in experiment_name) or ("COMBO" in experiment_name)
     real_ratio = params["real_ratio"] if model_based else None
     alpha = params["alpha"] if model_based else None
-    lam = params["lam"] if model_based else None
+    lam = params["lam"] if ("COUPLe" in experiment_name) else None
     rollout_batch_size = params["rollout_batch_size"] if model_based else None
     rollout_horizon = params["rollout_horizon"] if model_based else None
     rollout_interval = params["rollout_interval"] if model_based else None
@@ -281,7 +306,10 @@ def evaluate_policies(log_path="d3rlpy_logs"):
     # Checking GPU Availability
     use_gpu = torch.cuda.is_available()
 
-    train_results, test_results = {}, {}
+    # Printing dataset prefix for reference:
+    print(f"Dataset prefix: {dataset_prefix}")
+
+    train_results, test_results, train_results_stds, test_results_stds = {}, {}, {}, {}
     for (algo_label, experiment_label, experiment_name, checkpoint) in tqdm(TO_EVALUATE):
         policy_savepath = f"./{log_path}/{experiment_name}/{checkpoint}.pt"
         eval_savepath = f"./{log_path}/FQE_{experiment_name}/{checkpoint}.pt"
@@ -309,9 +337,11 @@ def evaluate_policies(log_path="d3rlpy_logs"):
         # Evaluate the policy:
         train_values, train_stds = evaluator.estimate_initial_state_values(evaluator.train_data)
         train_results[f"{algo_label}{experiment_label}"] = train_values.mean()
+        train_results_stds[f"{algo_label}{experiment_label}"] = train_values.std()
 
         test_values, test_stds = evaluator.estimate_initial_state_values(evaluator.test_data)
         test_results[f"{algo_label}{experiment_label}"] = test_values.mean()
+        test_results_stds[f"{algo_label}{experiment_label}"] = test_values.std()
 
     # Evaluate the physician and maximum policies:
     physician = PhysicianEvaluator(train_dataset, val_dataset, test_dataset, discrete_action=True)
@@ -319,18 +349,22 @@ def evaluate_policies(log_path="d3rlpy_logs"):
     phys_test_values = physician.estimate_initial_state_values(physician.test_data)
     train_results["Physician"] = phys_train_values.mean()
     test_results["Physician"] = phys_test_values.mean()
+    train_results_stds["Physician"] = phys_train_values.std()
+    test_results_stds["Physician"] = phys_test_values.std()
 
     max_evaluator = MaxEvaluator(train_dataset, val_dataset, test_dataset, discrete_action=True)
     max_train_values = max_evaluator.estimate_initial_state_values(max_evaluator.train_data)
     max_test_values = max_evaluator.estimate_initial_state_values(max_evaluator.test_data)
     train_results["Maximum"] = max_train_values.mean()
     test_results["Maximum"] = max_test_values.mean()
+    train_results_stds["Maximum"] = max_train_values.std()
+    test_results_stds["Maximum"] = max_test_values.std()
 
     # Print results:
-    print(f"Training set results: {train_results}")
-    print()
-    print(f"Test set results: {test_results}")
-    print()
+    print(f"Training set results: {train_results}\n")
+    print(f"Test set results: {test_results}\n")
+    print(f"Training set STD results: {train_results_stds}\n")
+    print(f"Test set STD results: {test_results_stds}\n")
 
 
 if __name__ == "__main__":
