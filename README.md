@@ -4,7 +4,7 @@
      alt="Workflow Visualisation"
      style="margin-right: 10px; width:80%;" />
 
-### *Figure 1: Visualisation of our end-to-end pipeline.*
+#### *Figure 1: Visualisation of our end-to-end pipeline.*
 
 ## 1. Data Processing
 <!-- TODO: Setup databases -->
